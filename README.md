@@ -1,4 +1,4 @@
-# BEMS AIoT – ESP32-S3, 01 PZEM thật và 19 phòng mô phỏng
+# BEMS AIoT – ESP32-S3
 
 **Building Energy Management System (BEMS)** là mô hình giám sát và phân tích mức tiêu thụ năng lượng trong tòa nhà. Dự án sử dụng kiến trúc **Hybrid**: một phòng đo bằng cảm biến PZEM-004T v3.0 và 19 phòng còn lại tạo dữ liệu mô phỏng bằng ESP32-S3.
 
