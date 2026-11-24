@@ -1,0 +1,38 @@
+{
+  "device_id": "esp32s3-bems-hybrid-01",
+  "firmware": "bems-hybrid-1.0.0",
+  "data_mode": "hybrid_one_real_nineteen_simulated",
+  "physical_pzem_count": 1,
+  "simulated_room_count": 19,
+  "timestamp_epoch_ms": 1794837600000,
+  "uptime_ms": 5000,
+  "rooms": [
+    {
+      "id": 1,
+      "room_name": "Room 01 - PZEM",
+      "source": "pzem004t_v3",
+      "simulated": false,
+      "valid": true,
+      "voltage_v": 230.1,
+      "current_a": 0.42,
+      "power_w": 85.0,
+      "energy_kwh": 12.345,
+      "power_factor": 0.88,
+      "frequency_hz": 50.0
+    },
+    {
+      "id": 2,
+      "room_name": "Room 02 - simulated",
+      "source": "synthetic_generator",
+      "simulated": true,
+      "valid": true,
+      "voltage_v": 230.0,
+      "current_a": 0.55,
+      "power_w": 110.0,
+      "energy_kwh": 0.012,
+      "power_factor": 0.90,
+      "frequency_hz": 50.0,
+      "virtual_load_shed": false
+    }
+  ]
+}

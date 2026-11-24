@@ -1,0 +1,108 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: bems-mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_sub -h 127.0.0.1 -t '$$SYS/broker/uptime' -C 1 -W 3 >/dev/null 2>&1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  influxdb:
+    image: influxdb:2.7-alpine
+    container_name: bems-influxdb
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUX_USERNAME:?Set INFLUX_USERNAME in .env}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUX_PASSWORD:?Set INFLUX_PASSWORD in .env}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUX_ORG:?Set INFLUX_ORG in .env}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUX_BUCKET:?Set INFLUX_BUCKET in .env}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUX_TOKEN:?Set INFLUX_TOKEN in .env}
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+      - influxdb_config:/etc/influxdb2
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  grafana:
+    image: grafana/grafana:11.6.0
+    container_name: bems-grafana
+    restart: unless-stopped
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-CHANGE_THIS_GRAFANA_PASSWORD}
+      INFLUX_ORG: ${INFLUX_ORG}
+      INFLUX_BUCKET: ${INFLUX_BUCKET}
+      INFLUX_TOKEN: ${INFLUX_TOKEN}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+
+  ai-bems:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bems-ai-engine
+    restart: unless-stopped
+    depends_on:
+      mosquitto:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
+    environment:
+      INFLUX_URL: http://influxdb:8086
+      INFLUX_TOKEN: ${INFLUX_TOKEN}
+      INFLUX_ORG: ${INFLUX_ORG}
+      INFLUX_BUCKET: ${INFLUX_BUCKET}
+      MQTT_HOST: mosquitto
+      MQTT_PORT: 1883
+      MQTT_USERNAME: ${MQTT_USERNAME:-}
+      MQTT_PASSWORD: ${MQTT_PASSWORD:-}
+      MQTT_TELEMETRY_TOPIC: ${MQTT_TELEMETRY_TOPIC:-bems/telemetry}
+      MQTT_COMMAND_PREFIX: ${MQTT_COMMAND_PREFIX:-bems/commands}
+      MQTT_ALERT_TOPIC: ${MQTT_ALERT_TOPIC:-bems/alerts}
+      TIMEZONE: ${TIMEZONE:-Asia/Ho_Chi_Minh}
+      TARIFF_PROFILE: ${TARIFF_PROFILE:-education_lv}
+      VAT_RATE: ${VAT_RATE:-0.0}
+      LSTM_MIN_HISTORY_HOURS: ${LSTM_MIN_HISTORY_HOURS:-720}
+      LSTM_RETRAIN_SECONDS: ${LSTM_RETRAIN_SECONDS:-43200}
+      ANOMALY_MIN_SAMPLES: ${ANOMALY_MIN_SAMPLES:-200}
+      ANOMALY_TRAIN_INTERVAL_SECONDS: ${ANOMALY_TRAIN_INTERVAL_SECONDS:-300}
+      ANOMALY_ALERT_COOLDOWN_SECONDS: ${ANOMALY_ALERT_COOLDOWN_SECONDS:-900}
+      NIGHT_HIGH_POWER_W: ${NIGHT_HIGH_POWER_W:-1500}
+      MODEL_DIR: /app/models
+      DR_ENABLED: ${DR_ENABLED:-true}
+      DRY_RUN: "true"
+      DR_BUILDING_LIMIT_W: ${DR_BUILDING_LIMIT_W:-6500}
+      DR_SHEDTABLE_ROOM_IDS: ${DR_SHEDTABLE_ROOM_IDS:-17,18,19,20}
+      DR_ESTIMATE_MINUTES: ${DR_ESTIMATE_MINUTES:-15}
+      DR_COMMAND_COOLDOWN_SECONDS: ${DR_COMMAND_COOLDOWN_SECONDS:-1800}
+      DR_VIRTUAL_REDUCTION_PERCENT: ${DR_VIRTUAL_REDUCTION_PERCENT:-75}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - ./models:/app/models
+
+volumes:
+  mosquitto_data:
+  mosquitto_log:
+  influxdb_data:
+  influxdb_config:
+  grafana_data:

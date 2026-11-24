@@ -1,0 +1,58 @@
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+models/*.keras
+models/*.joblib
+models/*.h5
+.DS_Store
+
+# Environment files and secrets
+.env.*
+!.env.example
+
+# API tokens and credentials
+**/influx_token
+**/cloud_sync_token
+**/*_token
+**/*token*
+**/secrets/
+
+# Private keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Python environments
+.venv/
+venv/
+
+# Runtime data and logs
+*.log
+**/sync_state.json
+**/cloud-sync/data/
+
+# Virtual machine files
+*.vmdk
+*.vdi
+*.vhd
+*.vhdx
+*.ova
+*.vmx
+*.vmem
+*.vmsn
+*.vmsd
+*.nvram
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+
+# Local backup files
+*.bak
+*.bak_*
+
+# Local Arduino IDE copy
+/Documents/Arduino/
