@@ -21,9 +21,6 @@ Dự án có kèm một máy ảo **Ubuntu Server đã cài đặt và cấu hì
 
 [**Mở thư mục BEMS-AIoT-Hybrid-Release trên Google Drive**](https://drive.google.com/drive/folders/11PTPNK9niT2Blyh7ru5CqPwHOPyhwNuY?usp=sharing)
 
-> [!WARNING]
-> Thư mục Google Drive được chia sẻ ở chế độ **Restricted** vì OVA giữ lại cấu hình và thông tin đăng nhập phục vụ làm việc nhóm. Người tải cần đăng nhập đúng tài khoản Google đã được chủ sở hữu cấp quyền. Không chuyển quyền truy cập sang `Anyone with the link` và không phát tán OVA hoặc thông tin đăng nhập ra ngoài nhóm.
-
 ### Xác minh file OVA sau khi tải
 
 Trước khi import, tải cả `BEMS-Ubuntu-Server.ova` và `BEMS-Ubuntu-Server.sha256.txt`. Trên Windows PowerShell, chạy lệnh sau (đổi đường dẫn nếu file được lưu ở vị trí khác):
