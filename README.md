@@ -979,19 +979,6 @@ Các mức dưới đây theo Quyết định **2892/QĐ-BCT ngày 31/10/2026**,
 
 Đồng bộ InfluxDB lên Cloudflare D1 chứng minh luồng lưu bản sao dữ liệu lên Cloud. Điều đó **chưa tự động chứng minh Disaster Recovery hoàn chỉnh**. Để kết luận có DR, cần có quy trình và kiểm thử khôi phục dữ liệu từ Cloud về môi trường mới, đồng thời kiểm tra tính toàn vẹn dữ liệu và thời gian khôi phục.
 
-## 19. Nguồn tài liệu
-
-- [Docker Desktop for Windows – Docker Docs](https://docs.docker.com/desktop/setup/install/windows-install/)
-- [WSL installation – Microsoft Learn](https://learn.microsoft.com/windows/wsl/install)
-- [Arduino IDE – Arduino](https://www.arduino.cc/en/software)
-- [Arduino-ESP32 installation – Espressif](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html)
-- [Python for Windows – Python.org](https://www.python.org/downloads/windows/)
-- [PZEM-004T v3.0 library – PZEM004Tv30](https://github.com/mandulaj/PZEM-004T-v30)
-- [PZEM-004T v3.0 datasheet/user manual](https://elektrologi.iptek.web.id/wp-content/uploads/2023/02/PZEM-004T-V3.0-Datasheet-User-Manual.pdf)
-- [Quyết định 2892/QĐ-BCT – EVN](https://www.evn.com.vn/d/vi-VN/news/Quyet-dinh-so-2892QD-BCT-ngay-31102026-cua-Bo-Cong-Thuong-quy-dinh-ve-gia-ban-dien-60-3569-510199)
-
----
-
 ## Ghi chú phát hành
 
 - Repository: [ThuHime/BEMS-AIoT-Hybrid](https://github.com/ThuHime/BEMS-AIoT-Hybrid)
