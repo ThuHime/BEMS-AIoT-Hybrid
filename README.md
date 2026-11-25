@@ -1,9 +1,96 @@
-# BEMS AIoT – ESP32-S3
+# BEMS AIoT – ESP32-S3, 01 PZEM thật và 19 phòng mô phỏng
 
 **Building Energy Management System (BEMS)** là mô hình giám sát và phân tích mức tiêu thụ năng lượng trong tòa nhà. Dự án sử dụng kiến trúc **Hybrid**: một phòng đo bằng cảm biến PZEM-004T v3.0 và 19 phòng còn lại tạo dữ liệu mô phỏng bằng ESP32-S3.
 
 > [!IMPORTANT]
 > **Phân biệt dữ liệu thật và dữ liệu mô phỏng là yêu cầu bắt buộc.** Chỉ Phòng 01 sử dụng dữ liệu PZEM thật khi cảm biến đọc hợp lệ. Phòng 02–20 là dữ liệu mô phỏng. Không trình bày 19 phòng mô phỏng như 19 công tơ hoặc cảm biến đo điện thật.
+
+## Ubuntu Server VM (OVA)
+
+Dự án có kèm một máy ảo **Ubuntu Server đã cài đặt và cấu hình môi trường BEMS** để các thành viên trong nhóm có thể tải về, import vào VMware Workstation Pro và tiếp tục phát triển mà không cần cài đặt lại toàn bộ hệ thống.
+
+| Thông tin | Giá trị |
+|---|---|
+| Tên file | `BEMS-Ubuntu-Server.ova` |
+| Dung lượng | Khoảng **7.62 GiB** |
+| Nền tảng | VMware Workstation Pro |
+| Hệ thống bên trong | Ubuntu Server, Docker, Mosquitto, Python AI Engine, InfluxDB, Grafana và BEMS Portal |
+| File kiểm tra | `BEMS-Ubuntu-Server.sha256.txt` |
+
+**Tải máy ảo và file checksum:**
+
+[**Mở thư mục BEMS-AIoT-Hybrid-Release trên Google Drive**](https://drive.google.com/drive/folders/11PTPNK9niT2Blyh7ru5CqPwHOPyhwNuY?usp=sharing)
+
+> [!WARNING]
+> Thư mục Google Drive được chia sẻ ở chế độ **Restricted** vì OVA giữ lại cấu hình và thông tin đăng nhập phục vụ làm việc nhóm. Người tải cần đăng nhập đúng tài khoản Google đã được chủ sở hữu cấp quyền. Không chuyển quyền truy cập sang `Anyone with the link` và không phát tán OVA hoặc thông tin đăng nhập ra ngoài nhóm.
+
+### Xác minh file OVA sau khi tải
+
+Trước khi import, tải cả `BEMS-Ubuntu-Server.ova` và `BEMS-Ubuntu-Server.sha256.txt`. Trên Windows PowerShell, chạy lệnh sau (đổi đường dẫn nếu file được lưu ở vị trí khác):
+
+```powershell
+Get-FileHash ".\BEMS-Ubuntu-Server.ova" -Algorithm SHA256
+```
+
+SHA256 chuẩn của file phát hành:
+
+```text
+9615EBD589558FB60ED2E1418F32038C89C6F8F91BAE167F98D16311529258F7
+```
+
+Chỉ tiếp tục import khi SHA256 tính được trùng khớp hoàn toàn. Nếu không khớp, tải lại file và kiểm tra lần nữa.
+
+### Import vào VMware Workstation Pro
+
+1. Cài và mở VMware Workstation Pro trên Windows.
+2. Chọn **File → Open**, sau đó chọn `BEMS-Ubuntu-Server.ova`.
+3. Đặt tên máy ảo và chọn thư mục lưu có đủ dung lượng trống.
+4. Nhấn **Import** và chờ VMware hoàn tất.
+5. Nếu VMware hỏi máy ảo đã được di chuyển hay sao chép, chọn **I Copied It** để tạo định danh máy ảo mới.
+6. Kiểm tra **Network Adapter**. Dùng NAT để truy cập các giao diện từ máy Windows; chuyển sang Bridged nếu cần ESP32-S3 trong cùng LAN kết nối trực tiếp tới MQTT broker.
+7. Khởi động Ubuntu và đăng nhập bằng thông tin tài khoản được trưởng nhóm cung cấp riêng.
+8. Kiểm tra các container bằng `sudo docker ps`.
+
+Các địa chỉ dịch vụ mặc định bên trong Ubuntu:
+
+| Dịch vụ | Địa chỉ |
+|---|---|
+| BEMS Portal | `http://<UBUNTU_IP>:8088` |
+| Grafana | `http://<UBUNTU_IP>:3000` |
+| InfluxDB | `http://<UBUNTU_IP>:8086` |
+| MQTT broker | `<UBUNTU_IP>:1883` |
+
+Thay `<UBUNTU_IP>` bằng địa chỉ IP hiện tại của máy ảo; IP có thể khác nhau tùy cấu hình NAT/Bridged và mạng của máy nhận. Tài khoản Ubuntu, Grafana, InfluxDB và MQTT được cung cấp riêng, không ghi trong README công khai.
+
+> [!NOTE]
+> Cloud Sync Agent được để dừng trong bản OVA để tránh hai máy cùng sử dụng một checkpoint và đồng bộ trùng lên Cloudflare D1. Chỉ bật lại Cloud Sync sau khi nhóm thống nhất máy nào là Agent đồng bộ chính và đã kiểm tra cấu hình token/Worker.
+
+---
+
+## Mục lục
+
+- [Ubuntu Server VM (OVA)](#ubuntu-server-vm-ova)
+- [1. Tổng quan và phạm vi mô hình](#1-tổng-quan-và-phạm-vi-mô-hình)
+- [2. Kiến trúc hệ thống](#2-kiến-trúc-hệ-thống)
+- [3. Yêu cầu máy tính và phần mềm](#3-yêu-cầu-máy-tính-và-phần-mềm)
+- [4. Nhận mã nguồn và kiểm tra thư mục](#4-nhận-mã-nguồn-và-kiểm-tra-thư-mục)
+- [5. Cấu hình file môi trường](#5-cấu-hình-file-môi-trường-env)
+- [6. Khởi động hệ thống bằng Docker](#6-khởi-động-hệ-thống-bằng-docker)
+- [7. Cài đặt Arduino IDE và ESP32-S3](#7-cài-đặt-arduino-ide-và-esp32-s3)
+- [8. Cấu hình Wi-Fi và MQTT](#8-cấu-hình-wi-fi-và-mqtt-cho-esp32-s3)
+- [9. PZEM-004T v30 và an toàn phần cứng](#9-pzem-004t-v30-và-nguyên-tắc-an-toàn)
+- [10. Kiểm tra dữ liệu MQTT](#10-kiểm-tra-dữ-liệu-mqtt)
+- [11. Kiểm tra AI Engine và InfluxDB](#11-kiểm-tra-backend-và-influxdb)
+- [12. Truy cập Grafana](#12-truy-cập-grafana-và-dashboard)
+- [13. Cài Python và chạy kiểm thử](#13-cài-python-và-chạy-kiểm-thử)
+- [14. Quản lý vòng đời hệ thống](#14-khởi-động-dừng-và-chạy-lại-hệ-thống)
+- [15. Cloud Backup lên Cloudflare D1 (tùy chọn)](#15-cloud-backup-lên-cloudflare-d1-tùy-chọn)
+- [16. Quy trình chạy dự án từ đầu đến cuối](#16-quy-trình-chạy-dự-án-từ-đầu-đến-cuối)
+- [17. Xử lý lỗi thường gặp](#17-xử-lý-lỗi-thường-gặp)
+- [18. Giới hạn và lưu ý khi báo cáo](#18-giới-hạn-và-lưu-ý-khi-báo-cáo)
+- [19. Nguồn tài liệu](#19-nguồn-tài-liệu)
+
+---
 
 ## 1. Tổng quan và phạm vi mô hình
 
@@ -922,8 +1009,20 @@ Các mức dưới đây theo Quyết định **2892/QĐ-BCT ngày 31/10/2026**,
 
 Đồng bộ InfluxDB lên Cloudflare D1 chứng minh luồng lưu bản sao dữ liệu lên Cloud. Điều đó **chưa tự động chứng minh Disaster Recovery hoàn chỉnh**. Để kết luận có DR, cần có quy trình và kiểm thử khôi phục dữ liệu từ Cloud về môi trường mới, đồng thời kiểm tra tính toàn vẹn dữ liệu và thời gian khôi phục.
 
+## 19. Nguồn tài liệu
 
-## Ghi chú
+- [Docker Desktop for Windows – Docker Docs](https://docs.docker.com/desktop/setup/install/windows-install/)
+- [WSL installation – Microsoft Learn](https://learn.microsoft.com/windows/wsl/install)
+- [Arduino IDE – Arduino](https://www.arduino.cc/en/software)
+- [Arduino-ESP32 installation – Espressif](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html)
+- [Python for Windows – Python.org](https://www.python.org/downloads/windows/)
+- [PZEM-004T v3.0 library – PZEM004Tv30](https://github.com/mandulaj/PZEM-004T-v30)
+- [PZEM-004T v3.0 datasheet/user manual](https://elektrologi.iptek.web.id/wp-content/uploads/2023/02/PZEM-004T-V3.0-Datasheet-User-Manual.pdf)
+- [Quyết định 2892/QĐ-BCT – EVN](https://www.evn.com.vn/d/vi-VN/news/Quyet-dinh-so-2892QD-BCT-ngay-31102026-cua-Bo-Cong-Thuong-quy-dinh-ve-gia-ban-dien-60-3569-510199)
+
+---
+
+## Ghi chú phát hành
 
 - Repository: [ThuHime/BEMS-AIoT-Hybrid](https://github.com/ThuHime/BEMS-AIoT-Hybrid)
 - Firmware chính: `firmware/main/main.ino`
