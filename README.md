@@ -1,4 +1,4 @@
-# BEMS AIoT – ESP32-S3, 01 PZEM thật và 19 phòng mô phỏng
+# BEMS AIoT – ESP32-S3
 
 **Building Energy Management System (BEMS)** là mô hình giám sát và phân tích mức tiêu thụ năng lượng trong tòa nhà. Dự án sử dụng kiến trúc **Hybrid**: một phòng đo bằng cảm biến PZEM-004T v3.0 và 19 phòng còn lại tạo dữ liệu mô phỏng bằng ESP32-S3.
 
@@ -63,34 +63,7 @@ Các địa chỉ dịch vụ mặc định bên trong Ubuntu:
 Thay `<UBUNTU_IP>` bằng địa chỉ IP hiện tại của máy ảo; IP có thể khác nhau tùy cấu hình NAT/Bridged và mạng của máy nhận. Tài khoản Ubuntu, Grafana, InfluxDB và MQTT được cung cấp riêng, không ghi trong README công khai.
 
 > [!NOTE]
-> Cloud Sync Agent được để dừng trong bản OVA để tránh hai máy cùng sử dụng một checkpoint và đồng bộ trùng lên Cloudflare D1. Chỉ bật lại Cloud Sync sau khi nhóm thống nhất máy nào là Agent đồng bộ chính và đã kiểm tra cấu hình token/Worker.
-
----
-
-## Mục lục
-
-- [Ubuntu Server VM (OVA)](#ubuntu-server-vm-ova)
-- [1. Tổng quan và phạm vi mô hình](#1-tổng-quan-và-phạm-vi-mô-hình)
-- [2. Kiến trúc hệ thống](#2-kiến-trúc-hệ-thống)
-- [3. Yêu cầu máy tính và phần mềm](#3-yêu-cầu-máy-tính-và-phần-mềm)
-- [4. Nhận mã nguồn và kiểm tra thư mục](#4-nhận-mã-nguồn-và-kiểm-tra-thư-mục)
-- [5. Cấu hình file môi trường](#5-cấu-hình-file-môi-trường-env)
-- [6. Khởi động hệ thống bằng Docker](#6-khởi-động-hệ-thống-bằng-docker)
-- [7. Cài đặt Arduino IDE và ESP32-S3](#7-cài-đặt-arduino-ide-và-esp32-s3)
-- [8. Cấu hình Wi-Fi và MQTT](#8-cấu-hình-wi-fi-và-mqtt-cho-esp32-s3)
-- [9. PZEM-004T v30 và an toàn phần cứng](#9-pzem-004t-v30-và-nguyên-tắc-an-toàn)
-- [10. Kiểm tra dữ liệu MQTT](#10-kiểm-tra-dữ-liệu-mqtt)
-- [11. Kiểm tra AI Engine và InfluxDB](#11-kiểm-tra-backend-và-influxdb)
-- [12. Truy cập Grafana](#12-truy-cập-grafana-và-dashboard)
-- [13. Cài Python và chạy kiểm thử](#13-cài-python-và-chạy-kiểm-thử)
-- [14. Quản lý vòng đời hệ thống](#14-khởi-động-dừng-và-chạy-lại-hệ-thống)
-- [15. Cloud Backup lên Cloudflare D1 (tùy chọn)](#15-cloud-backup-lên-cloudflare-d1-tùy-chọn)
-- [16. Quy trình chạy dự án từ đầu đến cuối](#16-quy-trình-chạy-dự-án-từ-đầu-đến-cuối)
-- [17. Xử lý lỗi thường gặp](#17-xử-lý-lỗi-thường-gặp)
-- [18. Giới hạn và lưu ý khi báo cáo](#18-giới-hạn-và-lưu-ý-khi-báo-cáo)
-- [19. Nguồn tài liệu](#19-nguồn-tài-liệu)
-
----
+> Cloud Sync Agent được để dừng trong bản OVA để tránh hai máy cùng sử dụng một checkpoint và đồng bộ trùng lên Cloudflare D1. Chỉ bật lại Cloud Sync sau khi nhóm thống nhất máy nào là Agent đồng bộ chính và đã kiểm tra cấu hình token/Worker
 
 ## 1. Tổng quan và phạm vi mô hình
 
